@@ -1,0 +1,24 @@
+// If you don't want to use third party, you can use the extension below
+extension UIImageView {
+    func getDataFromUrl(urlstr: String, completeBlock: ((data: NSData?) ->Void)) {
+        let url = NSURL(string: urlstr)
+        if let url = url {
+            NSURLSession.sharedSession().dataTaskWithURL(url, completionHandler: { (data, response, error) in
+                completeBlock(data: NSData(data: data!))
+            }).resume()
+        }
+    }
+    
+    func downloadImage(url: String) {
+        getDataFromUrl(url) { (data) in
+            dispatch_async(dispatch_get_main_queue(), {
+                self.contentMode = UIViewContentMode.ScaleAspectFill
+                self.image = UIImage(data: data!)
+            })
+        }
+    }
+}
+
+// How to use
+let image = UIImageView(frame: CGRectMake(0, 0, 100, 100))
+image.downloadImage("https://www.gettyimages.ca/gi-resources/images/Homepage/Category-Creative/UK/UK_Creative_462809583.jpg")
